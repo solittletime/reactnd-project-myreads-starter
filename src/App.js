@@ -27,19 +27,16 @@ class BooksApp extends React.Component {
   }
 
   handleChange(event, book) {
-    console.log(event.target.value);
-    console.log(book.id);
-    BooksAPI.update({ "id": book.id }, event.target.value).then(data => {
+    BooksAPI.update(book, event.target.value).then(data => {
       console.log(data);
-      // TODO use response data to update book.shelf
-      book.shelf = event.target.value;
-      // re-render
-      this.forceUpdate();
-      }).catch((err) => {
+    }).catch((err) => {
       console.log(err);
     });
+    book.shelf = event.target.value;
+    // re-render
+    this.forceUpdate();
   }
-  
+
   render() {
     const { books } = this.state;
 
