@@ -38,8 +38,16 @@ class BooksApp extends React.Component {
   }
 
   handleFilterTextChange(filterText) {
+    if (filterText === '') {
+      this.setState({
+        search: [],
+        filterText: ''
+      });
+      return;
+    }
+    console.log(filterText);
     BooksAPI.search(filterText).then(data => {
-      if (data.error) {
+      if (!data || data.error) {
         data = [];
       } else {
         // TODO - set shelf for books on shelf already
