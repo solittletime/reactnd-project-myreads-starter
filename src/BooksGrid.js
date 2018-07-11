@@ -9,9 +9,13 @@ class BooksGrid extends React.Component {
           <li key={book.id}>
             <div className="book">
               <div className="book-top">
-                <div className="book-cover" style={{ width: 128, height: 192, backgroundImage: `url( ${book.imageLinks.thumbnail}% )` }}></div>
+                {!book.imageLinks || !book.imageLinks.thumbnail ? (
+                  <div className="book-cover" style={{ width: 128, height: 192, backgroundImage: `url('no-image.png')` }}></div>
+                ) : (
+                  <div className="book-cover" style={{ width: 128, height: 192, backgroundImage: `url( ${book.imageLinks.thumbnail} )` }}></div>
+                )}
                 <div className="book-shelf-changer">
-                  <select value={book.shelf} onChange={(e) => this.props.onChange(e, book)}>
+                  <select value={book.shelf} onChange={(e) => this.props.onChange(e.target.value, book)}>
                     <option value="move" disabled>Move to...</option>
                     <option value="currentlyReading">Currently Reading</option>
                     <option value="wantToRead">Want to Read</option>
@@ -21,8 +25,12 @@ class BooksGrid extends React.Component {
                 </div>
               </div>
               <div className="book-title">{book.title}</div>
-              <div className="book-authors">{book.authors}</div>
-            </div>
+              {!book.authors ? (
+                <div className="book-authors">Anonymous</div>
+              ) : (
+                <div className="book-authors">{book.authors}</div>
+              )}
+        </div>
           </li>
         )}
       </ol>

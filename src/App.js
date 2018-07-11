@@ -25,16 +25,34 @@ class BooksApp extends React.Component {
     });
   }
 
-  handleChange(event, book) {
-    BooksAPI.update(book, event.target.value).then(data => {
-      console.log(data);
+  handleChange(value, updateBook) {
+    BooksAPI.update(updateBook, value).then((data) => {
+      // console.log(data);
+      const books = this.state.books;
+      let bookIndex = books.findIndex((book) => book.id === updateBook.id);
+      if (bookIndex >= 0) {
+        if (value === 'none') {
+          // mainpage - remove book
+          books.splice(bookIndex, 1);
+        } else {
+          // mainpage - update shelf
+          books[bookIndex].shelf = value;
+        }
+      } else {
+        // search - add book
+        updateBook.shelf = value;
+        books.push(updateBook);
+      }
+      const search = this.state.search;
+      let searchIndex = search.findIndex((book) => book.id === updateBook.id);
+      if (searchIndex >= 0) {
+        // search - update shelf
+        search[searchIndex].shelf = value;
+      }
+      this.setState({ books: books, search: search })
     }).catch((err) => {
       console.log(err);
     });
-    // TODO - if shelf "none" then remove book from array
-    book.shelf = event.target.value;
-    // re-render
-    this.forceUpdate();
   }
 
   handleFilterTextChange(filterText) {
@@ -45,18 +63,21 @@ class BooksApp extends React.Component {
       });
       return;
     }
-    console.log(filterText);
-    BooksAPI.search(filterText).then(data => {
-      if (!data || data.error) {
-        data = [];
+    BooksAPI.search(filterText).then((foundBooks) => {
+      if (!foundBooks || foundBooks.error) {
+        foundBooks = [];
       } else {
-        // TODO - set shelf for books on shelf already
-        data.forEach((n) => {
-          n.shelf = 'none';
+        foundBooks.forEach((foundBook) => {
+          let match = this.state.books.find((book) => book.id === foundBook.id);
+          if (match) {
+            foundBook.shelf = match.shelf;
+          } else {
+            foundBook.shelf = 'none';
+          }
         });
       }
       this.setState({
-        search: data,
+        search: foundBooks,
         filterText: filterText
       });
     });
