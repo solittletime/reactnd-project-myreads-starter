@@ -23,12 +23,12 @@ class BooksApp extends React.Component {
     this.bookSearch = debounce(this.bookSearch, 300);
   }
 
+  // define search function
   bookSearch = filterText => {
     console.log(this.state);
     if (filterText === '') {
       this.setState({
-        search: [],
-        filterText: ''
+        search: []
       });
       return;
     }
