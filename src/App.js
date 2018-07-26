@@ -1,5 +1,8 @@
 import React from 'react'
 import { Link, Route, Switch } from 'react-router-dom';
+
+import { debounce } from 'lodash'
+
 import Search from './Search';
 import BooksGrid from './BooksGrid';
 import * as BooksAPI from './BooksAPI'
@@ -17,6 +20,36 @@ class BooksApp extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleFilterTextChange = this.handleFilterTextChange.bind(this);
+    this.bookSearch = debounce(this.bookSearch, 300);
+  }
+
+  bookSearch = filterText => {
+    console.log(this.state);
+    if (filterText === '') {
+      this.setState({
+        search: [],
+        filterText: ''
+      });
+      return;
+    }
+    BooksAPI.search(filterText).then((foundBooks) => {
+      if (!foundBooks || foundBooks.error) {
+        foundBooks = [];
+      } else {
+        foundBooks.forEach((foundBook) => {
+          let match = this.state.books.find((book) => book.id === foundBook.id);
+          if (match) {
+            foundBook.shelf = match.shelf;
+          } else {
+            foundBook.shelf = 'none';
+          }
+        });
+      }
+      this.setState({
+        search: [...foundBooks]
+      });
+    });
+    return 0;
   }
 
   componentDidMount() {
@@ -56,31 +89,10 @@ class BooksApp extends React.Component {
   }
 
   handleFilterTextChange(filterText) {
-    if (filterText === '') {
-      this.setState({
-        search: [],
-        filterText: ''
-      });
-      return;
-    }
-    BooksAPI.search(filterText).then((foundBooks) => {
-      if (!foundBooks || foundBooks.error) {
-        foundBooks = [];
-      } else {
-        foundBooks.forEach((foundBook) => {
-          let match = this.state.books.find((book) => book.id === foundBook.id);
-          if (match) {
-            foundBook.shelf = match.shelf;
-          } else {
-            foundBook.shelf = 'none';
-          }
-        });
-      }
-      this.setState({
-        search: foundBooks,
-        filterText: filterText
-      });
+    this.setState({
+      filterText: filterText
     });
+    this.bookSearch(filterText);
   }
 
   render() {
