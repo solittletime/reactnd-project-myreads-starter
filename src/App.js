@@ -25,7 +25,6 @@ class BooksApp extends React.Component {
 
   // define search function
   bookSearch = filterText => {
-    console.log(this.state);
     if (filterText === '') {
       this.setState({
         search: []
@@ -49,7 +48,6 @@ class BooksApp extends React.Component {
         search: [...foundBooks]
       });
     });
-    return 0;
   }
 
   componentDidMount() {
